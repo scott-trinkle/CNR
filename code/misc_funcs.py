@@ -1,20 +1,22 @@
+#!/usr/bin/env python
+
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import interpolate
+from scipy.interpolate import interp1d
 
 
 class Material(object):
 
     def __init__(self, name, thickness=None, density=None):
         self.name = name
-        self.fn = 'atten_data/u_p_' + name + '.txt'
+        self.fn = '../atten_data/u_p_' + name + '.txt'
         self.E, self.u_p = read_atten_data(self.fn)
         self.thickness = thickness
         self.density = density
 
     def change_mat(self, name):
         self.name = name
-        self.fn = 'atten_data/u_p_' + name + '.txt'
+        self.fn = '../atten_data/u_p_' + name + '.txt'
         self.E, self.u_p = read_atten_data(self.fn)
 
     def plot_u_p(self):
@@ -65,7 +67,7 @@ def log_interp(xx, yy, xx_new):
 
     logx = np.log10(xx)
     logy = np.log10(yy)
-    lin_interp = interpolate.interp1d(logx, logy)
+    lin_interp = interp1d(logx, logy)
 
     def log_interp(zz): return np.power(10.0, lin_interp(np.log10(zz)))
     return log_interp(xx_new)
@@ -92,6 +94,7 @@ def match_energies(bg, contrast):
 
 
 def plot_1d(bg, contrast):
+    plt.close()
 
     if hasattr(contrast.thickness, '__len__'):
         for d in contrast.thickness:
@@ -110,9 +113,6 @@ def plot_1d(bg, contrast):
 
     if hasattr(contrast.density, '__len__'):
         for p in contrast.density:
-            # CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * p) * \
-            #     np.sqrt(np.exp(-bg.u_p_int * bg.density * bg.thickness -
-            #                    contrast.u_p_int * p * contrast.thickness))
             CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * p) * \
                 np.sqrt(np.exp(-bg.u_p_int * bg.density * bg.thickness -
                                contrast.u_p_int * p * contrast.thickness))
@@ -130,8 +130,8 @@ def plot_1d(bg, contrast):
             CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
                 np.sqrt(np.exp(-bg.u_p_int * bg.density * d -
                                contrast.u_p_int * contrast.density * contrast.thickness))
-            plt.plot(bg.E_int, CNR, label='{} mm {} length'.format(
-                np.round(d, 3), bg.name))
+            plt.plot(bg.E_int, CNR, label='{} mm total'.format(
+                np.round((d + 0.01) * 10, 3)))
 
         plt.title('Background thickness\n{} g/cc {} density, {} mm {} length, {} g/cc {} density'.format(contrast.density,
                                                                                                          contrast.name,
@@ -158,7 +158,6 @@ def plot_1d(bg, contrast):
     plt.ylabel('CNR')
     plt.legend()
     plt.xlim([0, 40])
-    plt.show()
 
 
 def parameter_string(index):

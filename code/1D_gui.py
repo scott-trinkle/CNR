@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, RadioButtons, Button
@@ -6,8 +8,8 @@ from misc_funcs import Material
 
 def get_cnr(bg, contrast):
     CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
-        np.sqrt(np.exp(-bg.u_p_int * bg.density * bg.thickness -
-                       contrast.u_p_int * contrast.density * contrast.thickness))
+        np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * 0.1) -
+                       contrast.u_p_int * contrast.density * (contrast.thickness * 0.1)))
     return CNR
 
 
@@ -105,11 +107,11 @@ class Parameter_Widget(object):
 
 # Initial values
 bg = Material(name='H2O',
-              thickness=0.19,
+              thickness=1.9,
               density=1.0)
 
 contrast = Material(name='Os',
-                    thickness=0.01,
+                    thickness=0.1,
                     density=0.003)
 
 contrast.match_energies_with(bg)
@@ -125,7 +127,9 @@ fig.set_facecolor('lightgray')
 cnr_line, = main_ax.plot(bg.E_int, get_cnr(bg, contrast), 'k')
 main_ax.set_xlabel('E [keV]')
 main_ax.set_ylabel('CNR')
-main_ax.set_title('Contrast to Noise Ratio (CNR)')
+eqn_abs = r'CNR = $|(\frac{\mu}{\rho})_{c}(E)\rho_{c} - (\frac{\mu}{\rho})_{bg}(E)\rho_{bg}|$ * '
+eqn_exp = r'$\sqrt{exp\{-(\frac{\mu}{\rho})_{c}\rho_c d_c -(\frac{\mu}{\rho})_{bg}\rho_{bg}d_{bg}\}}$'
+main_ax.set_title(eqn_abs + eqn_exp)
 main_ax.set_xlim([0, 50])
 main_ax.grid(True)
 
@@ -143,9 +147,10 @@ bg_mat_widget = Material_Widget(rect=[0.20, 0.65, 0.08, 0.25],
 total_thickness_widget = Parameter_Widget(rect=[0.07, 0.60, 0.21, 0.03],
                                           title=r'$d_{tot}$',
                                           low=0.01,
-                                          high=2,
+                                          high=10,
                                           init=bg.thickness + contrast.thickness,
-                                          units='cm',
+                                          units='mm',
+                                          fmt='%1.2f',
                                           sup_title='Background Parameters')
 
 bg_density_widget = Parameter_Widget(rect=[0.07, 0.55, 0.21, 0.03],
@@ -153,20 +158,22 @@ bg_density_widget = Parameter_Widget(rect=[0.07, 0.55, 0.21, 0.03],
                                      low=0.5,
                                      high=1.5,
                                      init=bg.density,
+                                     fmt='%1.2f',
                                      units='g/cc')
 
 contrast_thickness_widget = Parameter_Widget(rect=[0.07, 0.4, 0.21, 0.03],
                                              title=r'$d_{con}$',
                                              low=0.01,
-                                             high=2,
+                                             high=10,
                                              init=contrast.thickness,
-                                             units='cm',
+                                             units='mm',
+                                             fmt='%1.2f',
                                              sup_title='Contrast Parameters')
 
 contrast_density_widget = Parameter_Widget(rect=[0.07, 0.35, 0.21, 0.03],
                                            title=r'$\rho_{con}$',
-                                           low=0.0005,
-                                           high=0.005,
+                                           low=0.0001,
+                                           high=0.05,
                                            init=contrast.density,
                                            units='g/cc')
 
@@ -174,7 +181,7 @@ energy_widget = Parameter_Widget(rect=[0.07, 0.20, 0.21, 0.03],
                                  title=r'$E_{max}$',
                                  low=0,
                                  high=100,
-                                 init=50,
+                                 init=40,
                                  fmt='%1.0f',
                                  sup_title='Maximum Energy',
                                  units='keV',
