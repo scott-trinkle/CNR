@@ -3,5 +3,4 @@
 *__pycache__*
 old_tests
 .ipynb_checkpoints
-examples
 convert_to_numpy.py
