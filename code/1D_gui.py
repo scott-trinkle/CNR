@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, RadioButtons, Button
 from misc_funcs import Material
 
+##########################################################################
+#                                Functions                               #
+##########################################################################
+
 
 def get_cnr(bg, contrast):
     CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
@@ -85,6 +89,10 @@ def reset(event):
     contrast_density_widget.slider.reset()
     energy_widget.slider.reset()
 
+##########################################################################
+#                                Classes                                 #
+##########################################################################
+
 
 class Material_Widget(object):
     def __init__(self, rect, title, default):
@@ -103,6 +111,12 @@ class Parameter_Widget(object):
         self.slider = Slider(self.ax, title, low,
                              high, valinit=init, valfmt=fmt + ' ' + units)
         self.slider.on_changed(update_func)
+
+
+##########################################################################
+#                          Initial Values                                #
+##########################################################################
+
 
 
 # Initial values
@@ -128,10 +142,15 @@ cnr_line, = main_ax.plot(bg.E_int, get_cnr(bg, contrast), 'k')
 main_ax.set_xlabel('E [keV]')
 main_ax.set_ylabel('CNR')
 eqn_abs = r'CNR = $|(\frac{\mu}{\rho})_{c}(E)\rho_{c} - (\frac{\mu}{\rho})_{bg}(E)\rho_{bg}|$ * '
-eqn_exp = r'$\sqrt{exp\{-(\frac{\mu}{\rho})_{c}\rho_c d_c -(\frac{\mu}{\rho})_{bg}\rho_{bg}d_{bg}\}}$'
+eqn_exp = r'$\sqrt{exp\{-(\frac{\mu}{\rho})_{c}(E)\rho_c d_c -(\frac{\mu}{\rho})_{bg}(E)\rho_{bg}d_{bg}\}}$'
 main_ax.set_title(eqn_abs + eqn_exp)
-main_ax.set_xlim([0, 50])
+main_ax.set_xlim([0, 40])
 main_ax.grid(True)
+
+
+##########################################################################
+#                              Widgets                                   #
+##########################################################################
 
 
 # Widget initiation
