@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append('../code/')
-from misc_funcs import Material
+from material import Material
 
 
 def plot_1d(bg, contrast):
