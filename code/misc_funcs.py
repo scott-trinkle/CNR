@@ -16,7 +16,7 @@ class Material(object):
 
     def change_mat(self, name):
         self.name = name
-        self.fn = '../atten_data/u_p_' + name + '.txt'
+        self.fn = '../atten_data/u_p_' + name + '.npy'
         self.E, self.u_p = self.__read_atten_data__(self.fn)
 
     def plot_u_p(self):
