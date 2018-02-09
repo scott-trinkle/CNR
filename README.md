@@ -12,7 +12,7 @@ The folder 'replicating_alexandras_plots/' contains work related to reproducing 
 
 Note that similar trends are seen for the plots varying total thickness (Figures 5A and 5B), but the CNR trend is reversed for plots varying contrast density (Figures 4A and 4B). The same parameters are represented in the default slider ranges set by the 'run_GUI.py' interface - you can see that increasing the contrast density reduces the CNR for very small values (up to about 0.02 g/cc). After this point, increasing the contrast density increases the CNR, as expected. 
 
-The folders '/alexandras_plots/' and '/my_plots' contain the .pngs used in to create the .pdf. Alexandra's figures were taken from 'Alexandra Rojec ACS Paper.pdf', my figures were generated with 'replicate_plots.py'
+The folders 'alexandras_plots/' and 'my_plots/' contain the .pngs used to create the .pdf. Alexandra's figures were taken from 'Alexandra Rojec ACS Paper.pdf', my figures were generated with 'replicate_plots.py'
 
 ## Data/
 
