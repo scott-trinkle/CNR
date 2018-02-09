@@ -32,7 +32,7 @@ max_bg_density = 1.5
 
 # Choose min and max contrast material density range, in g/cc
 min_contrast_density = 0.0001
-max_contrast_density = 0.005
+max_contrast_density = 0.05
 
 # Chose maximum intensity value, in number of photons
 max_intensity_val = 1e5
