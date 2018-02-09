@@ -18,7 +18,8 @@ except NameError:
     # testing using emacs python shell)
     pass
 
-# Thickness range, in mm
+# Thickness range
+units = 'mm'  # choose 'mm' or 'nm'
 min_thickness = 0.1
 max_thickness = 2
 
@@ -28,7 +29,7 @@ max_bg_density = 1.5
 
 # Contrast material density range, in g/cc
 min_contrast_density = 0.0001
-max_contrast_density = 0.005
+max_contrast_density = 0.05
 
 # Maximum intensity value, in number of photons
 max_intensity_val = 1e5
@@ -37,4 +38,5 @@ GUI(thickness_values=np.array([min_thickness, max_thickness]),
     bg_density_values=np.array([min_bg_density, max_bg_density]),
     contrast_density_values=np.array(
         [min_contrast_density, max_contrast_density]),
-    max_intensity_value=max_intensity_val)
+    max_intensity_value=max_intensity_val,
+    thickness_units=units)

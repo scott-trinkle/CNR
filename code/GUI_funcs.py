@@ -68,19 +68,21 @@ class GUI(object):
     '''
 
     def __init__(self, thickness_values, bg_density_values, contrast_density_values,
-                 max_intensity_value, bg=0, contrast=1, init_max_E=40,
+                 max_intensity_value, thickness_units='mm', bg=0, contrast=1, init_max_E=40,
                  figsize=(14, 8), linecolor='k'):
 
         mat_names = ['H2O', 'Os', 'U', 'Pb']
 
+        self.nm = False if thickness_units == 'mm' else True
+
         # Initial values
         self.bg = Material(name=mat_names[bg],
-                           thickness=thickness_values.mean() * 3 / 4,  # mm
-                           density=bg_density_values.mean())  # g/cc
+                           thickness=thickness_values.mean() * 3 / 4,
+                           density=bg_density_values.mean())
 
         self.contrast = Material(name=mat_names[contrast],
-                                 thickness=thickness_values.mean() / 4,  # mm
-                                 density=contrast_density_values.mean())  # g/cc
+                                 thickness=thickness_values.mean() / 4,
+                                 density=contrast_density_values.mean())
 
         self.contrast.match_energies_with(self.bg)
 
@@ -120,8 +122,8 @@ class GUI(object):
                                                        low=thickness_values[0],
                                                        high=thickness_values[1],
                                                        init=self.bg.thickness + self.contrast.thickness,
-                                                       units='mm',
-                                                       fmt='%1.2f',
+                                                       units='nm' if self.nm else 'mm',
+                                                       fmt='%1.0f' if self.nm else '%1.2f',
                                                        sup_title='Background Parameters',
                                                        update_func=self.update)
 
@@ -141,8 +143,8 @@ class GUI(object):
                                                           low=thickness_values[0],
                                                           high=thickness_values[1],
                                                           init=self.contrast.thickness,
-                                                          units='mm',
-                                                          fmt='%1.2f',
+                                                          units='nm' if self.nm else 'mm',
+                                                          fmt='%1.0f' if self.nm else '%1.2f',
                                                           sup_title='Contrast Parameters',
                                                           update_func=self.update)
 
@@ -214,7 +216,7 @@ class GUI(object):
                              I : photons
                            u_p : cm2/g
                        density : g / cm3
-                     thickness : mm
+                     thickness : mm (or nm if nm=True)
 
 
         Returns
@@ -224,9 +226,15 @@ class GUI(object):
             bg and contrast
         '''
 
+        # Sets conversion factor from input thickness unit to cm
+        if self.nm:
+            conv = 1e-7
+        else:
+            conv = 0.1
+
         CNR = np.sqrt(I) * abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
-            np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * 0.1) -
-                           contrast.u_p_int * contrast.density * (contrast.thickness * 0.1)))
+            np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * conv) -
+                           contrast.u_p_int * contrast.density * (contrast.thickness * conv)))
         return CNR
 
     def update(self, value):
