@@ -4,7 +4,7 @@ Developing a series of tools and GUIs to optimize contrast-to-noise ratio (CNR) 
 
 ## code/
 
-Run '1D_gui.py' to launch a Python GUI displaying CNR as a function of x-ray energy, with options to adjust contrast and background material parameters. 
+Run the python script 'run_GUI.py' to launch a matplotlib-based GUI displaying CNR as a function of x-ray energy, with options to adjust contrast and background material parameters. 'run_GUI.py' can easily be customized to launch a GUI with different minimum and maximum values for these.
 
 ## replicating_alexandras_plots/
 
