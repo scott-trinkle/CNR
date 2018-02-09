@@ -18,22 +18,27 @@ except NameError:
     # testing using emacs python shell)
     pass
 
-# Thickness range
-units = 'mm'  # choose 'mm' or 'nm'
+
+# Choose thickness units to be 'mm' or 'nm'
+units = 'mm'
+
+# Choose min and max sample thickness values (in units chosen above)
 min_thickness = 0.1
 max_thickness = 2
 
-# Background material density range, in g / cc
+# Choose min and max background material density range, in g / cc
 min_bg_density = 0.5
 max_bg_density = 1.5
 
-# Contrast material density range, in g/cc
+# Choose min and max contrast material density range, in g/cc
 min_contrast_density = 0.0001
-max_contrast_density = 0.05
+max_contrast_density = 0.005
 
-# Maximum intensity value, in number of photons
+# Chose maximum intensity value, in number of photons
 max_intensity_val = 1e5
 
+# This creates and launches a GUI displaying CNR as a function of energy
+# for parameter ranges chosen above
 GUI(thickness_values=np.array([min_thickness, max_thickness]),
     bg_density_values=np.array([min_bg_density, max_bg_density]),
     contrast_density_values=np.array(

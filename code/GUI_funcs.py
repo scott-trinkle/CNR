@@ -51,6 +51,8 @@ class GUI(object):
         Min and max values for the contrast material density slider
     max_intensity_value : int
         Maximum number of photons for entrance intensity slider
+    thickness_units : str
+        Either 'mm' or 'nm' 
     bg, contrast : int
         Choice of initial materials.
              0 - H2O
