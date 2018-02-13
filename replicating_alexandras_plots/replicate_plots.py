@@ -10,7 +10,7 @@ def plot_1d(bg, contrast):
 
     if hasattr(contrast.thickness, '__len__'):
         for d in contrast.thickness:
-            CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
+            CNR = 10 * abs(contrast.u_p_int * contrast.density) * \
                 np.sqrt(np.exp(-bg.u_p_int * bg.density * bg.thickness -
                                contrast.u_p_int * contrast.density * d))
             plt.plot(bg.E_int, CNR, label='{} mm {} length'.format(
@@ -25,7 +25,7 @@ def plot_1d(bg, contrast):
 
     if hasattr(contrast.density, '__len__'):
         for p in contrast.density:
-            CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * p) * \
+            CNR = 10 * abs(contrast.u_p_int * p) * \
                 np.sqrt(np.exp(-bg.u_p_int * bg.density * bg.thickness -
                                contrast.u_p_int * p * contrast.thickness))
             plt.plot(bg.E_int, CNR,
@@ -39,7 +39,7 @@ def plot_1d(bg, contrast):
 
     if hasattr(bg.thickness, '__len__'):
         for d in bg.thickness:
-            CNR = abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
+            CNR = 10 * abs(contrast.u_p_int * contrast.density) * \
                 np.sqrt(np.exp(-bg.u_p_int * bg.density * d -
                                contrast.u_p_int * contrast.density * contrast.thickness))
             plt.plot(bg.E_int, CNR, label='{} mm total'.format(
@@ -54,7 +54,7 @@ def plot_1d(bg, contrast):
 
     if hasattr(bg.density, '__len__'):
         for p in bg.density:
-            CNR = abs(bg.u_p_int * p - contrast.u_p_int * contrast.density) * \
+            CNR = 10 * abs(contrast.u_p_int * contrast.density) * \
                 np.sqrt(np.exp(-bg.u_p_int * p * bg.thickness -
                                contrast.u_p_int * contrast.density * contrast.thickness))
             plt.plot(
@@ -106,16 +106,16 @@ Os = Material('Os', thickness=d_con, density=p_vec)
 H2O = Material('H2O', thickness=d_bg_0, density=p_bg_0)
 Os.match_energies_with(H2O)
 plot_1d(bg=H2O, contrast=Os)
-plt.ylim([0, 6])
-plt.savefig('replicated_plots/fig_4A.png', dpi=300)
+#plt.ylim([0, 6])
+plt.savefig('my_plots/fig_4A.png', dpi=300)
 
 # Graph Two
 U = Material('U', thickness=d_con, density=p_vec)
 H2O = Material('H2O', thickness=d_bg_0, density=p_bg_0)
 U.match_energies_with(H2O)
 plot_1d(bg=H2O, contrast=U)
-plt.ylim([0, 8])
-plt.savefig('replicated_plots/fig_4B.png', dpi=300)
+#plt.ylim([0, 8])
+plt.savefig('my_plots/fig_4B.png', dpi=300)
 
 # Graph Three
 Os = Material('Os', thickness=d_con, density=p_con_0)
@@ -123,7 +123,7 @@ H2O = Material('H2O', thickness=d_tot_vec, density=p_bg_0)
 Os.match_energies_with(H2O)
 plot_1d(bg=H2O, contrast=Os)
 plt.ylim([0, 12])
-plt.savefig('replicated_plots/fig_5A.png', dpi=300)
+plt.savefig('my_plots/fig_5A.png', dpi=300)
 
 # Graph Three
 U = Material('U', thickness=d_con, density=p_con_0)
@@ -131,4 +131,4 @@ H2O = Material('H2O', thickness=d_tot_vec, density=p_bg_0)
 U.match_energies_with(H2O)
 plot_1d(bg=H2O, contrast=U)
 plt.ylim([0, 12])
-plt.savefig('replicated_plots/fig_5B.png', dpi=300)
+plt.savefig('my_plots/fig_5B.png', dpi=300)

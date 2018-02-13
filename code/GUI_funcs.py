@@ -99,8 +99,8 @@ class GUI(object):
             self.bg.E_int, self.get_cnr(self.bg, self.contrast), linecolor)
         self.main_ax.set_xlabel('E [keV]')
         self.main_ax.set_ylabel('CNR')
-        eqn_abs = r'CNR = $\sqrt{I_0}|(\frac{\mu}{\rho})_{c}(E)\rho_{c} - (\frac{\mu}{\rho})_{bg}(E)\rho_{bg}|$ * '
-        eqn_exp = r'$\sqrt{exp\{-(\frac{\mu}{\rho})_{c}(E)\rho_c d_c -(\frac{\mu}{\rho})_{bg}(E)\rho_{bg}d_{bg}\}}$'
+        eqn_abs = r'CNR = $\sqrt{I_0}\left(\frac{\mu}{\rho}\right)_{c}(E)\rho_{c}$ * '
+        eqn_exp = r'$\sqrt{exp\{-\left(\frac{\mu}{\rho}\right)_{c}(E)\rho_c d_c -\left(\frac{\mu}{\rho}\right)_{bg}(E)\rho_{bg}d_{bg}\}}$'
         self.main_ax.set_title(eqn_abs + eqn_exp)
         self.main_ax.set_xlim([0, init_max_E])
         self.main_ax.grid(True)
@@ -234,9 +234,14 @@ class GUI(object):
         else:
             conv = 0.1
 
-        CNR = np.sqrt(I) * abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
+        # CNR = np.sqrt(I) * abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
+        #     np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * conv) -
+        # contrast.u_p_int * contrast.density * (contrast.thickness * conv)))
+
+        CNR = np.sqrt(I) * abs(contrast.u_p_int * contrast.density) * \
             np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * conv) -
                            contrast.u_p_int * contrast.density * (contrast.thickness * conv)))
+
         return CNR
 
     def update(self, value):

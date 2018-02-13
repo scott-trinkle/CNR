@@ -23,7 +23,7 @@ except NameError:
 units = 'mm'
 
 # Choose min and max sample thickness values (in units chosen above)
-min_thickness = 0.1
+min_thickness = 0.0001
 max_thickness = 2
 
 # Choose min and max background material density range, in g / cc
@@ -32,7 +32,7 @@ max_bg_density = 1.5
 
 # Choose min and max contrast material density range, in g/cc
 min_contrast_density = 0.0001
-max_contrast_density = 0.05
+max_contrast_density = 0.005
 
 # Chose maximum intensity value, in number of photons
 max_intensity_val = 1e5
