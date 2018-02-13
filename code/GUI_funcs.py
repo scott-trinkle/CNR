@@ -28,6 +28,7 @@ class Parameter_Widget(object):
 
     def __init__(self, rect, title, low, high, init, units, update_func, sup_title=None, fmt='% 1.4f'):
         self.ax = plt.axes(rect)
+        self.high = high
         if sup_title is not None:
             self.ax.set_title(sup_title)
         self.slider = Slider(self.ax, title, low,
@@ -37,13 +38,13 @@ class Parameter_Widget(object):
 
 class GUI(object):
     '''
-    Creates a new GUI updating a curve of CNR vs energy for a 
+    Creates a new GUI updating a curve of CNR vs energy for a
     given a set of input parameters
 
     Parameters
     __________
     thickness_values : ndarray
-        Min and max values for the thickness sliders. In the format: 
+        Min and max values for the thickness sliders. In the format:
         np.array([min_thickness, max_thickness])
     bg_density_values : ndarray
         Min and max values for the background density slider
@@ -52,7 +53,7 @@ class GUI(object):
     max_intensity_value : int
         Maximum number of photons for entrance intensity slider
     thickness_units : str
-        Either 'mm' or 'nm' 
+        Either 'mm' or 'nm'
     bg, contrast : int
         Choice of initial materials.
              0 - H2O
@@ -107,19 +108,19 @@ class GUI(object):
 
         # Material selection
 
-        self.contrast_mat_widget = Material_Widget(rect=[0.07, 0.65, 0.08, 0.25],
+        self.contrast_mat_widget = Material_Widget(rect=[0.07, 0.70, 0.08, 0.25],
                                                    title='Contrast\n Material',
                                                    default=contrast,  # Default: Osmium
                                                    update_func=self.update_mat)
 
-        self.bg_mat_widget = Material_Widget(rect=[0.20, 0.65, 0.08, 0.25],
+        self.bg_mat_widget = Material_Widget(rect=[0.20, 0.70, 0.08, 0.25],
                                              title='Background\n Material',
                                              default=bg,  # Default: H2O
                                              update_func=self.update_mat)
 
         # Background parameters
 
-        self.total_thickness_widget = Parameter_Widget(rect=[0.07, 0.60, 0.21, 0.03],
+        self.total_thickness_widget = Parameter_Widget(rect=[0.07, 0.65, 0.21, 0.03],
                                                        title=r'$d_{tot}$',
                                                        low=thickness_values[0],
                                                        high=thickness_values[1],
@@ -129,7 +130,7 @@ class GUI(object):
                                                        sup_title='Background Parameters',
                                                        update_func=self.update)
 
-        self.bg_density_widget = Parameter_Widget(rect=[0.07, 0.55, 0.21, 0.03],
+        self.bg_density_widget = Parameter_Widget(rect=[0.07, 0.60, 0.21, 0.03],
                                                   title=r'$\rho_{bg}$',
                                                   low=bg_density_values[0],
                                                   high=bg_density_values[1],
@@ -140,7 +141,7 @@ class GUI(object):
 
         # Contrast Parameters
 
-        self.contrast_thickness_widget = Parameter_Widget(rect=[0.07, 0.45, 0.21, 0.03],
+        self.contrast_thickness_widget = Parameter_Widget(rect=[0.07, 0.50, 0.21, 0.03],
                                                           title=r'$d_{con}$',
                                                           low=thickness_values[0],
                                                           high=thickness_values[1],
@@ -150,7 +151,7 @@ class GUI(object):
                                                           sup_title='Contrast Parameters',
                                                           update_func=self.update)
 
-        self.contrast_density_widget = Parameter_Widget(rect=[0.07, 0.40, 0.21, 0.03],
+        self.contrast_density_widget = Parameter_Widget(rect=[0.07, 0.45, 0.21, 0.03],
                                                         title=r'$\rho_{con}$',
                                                         low=contrast_density_values[0],
                                                         high=contrast_density_values[1],
@@ -160,7 +161,7 @@ class GUI(object):
 
         # System parameters
 
-        self.intensity_widget = Parameter_Widget(rect=[0.07, 0.30, 0.21, 0.03],
+        self.intensity_widget = Parameter_Widget(rect=[0.07, 0.35, 0.21, 0.03],
                                                  title=r'$I_0$',
                                                  low=1,
                                                  high=max_intensity_value,
@@ -170,24 +171,33 @@ class GUI(object):
                                                  sup_title='Entrance Intensity',
                                                  update_func=self.update)
 
-        self.energy_widget = Parameter_Widget(rect=[0.07, 0.20, 0.21, 0.03],
-                                              title=r'$E_{max}$',
-                                              low=0,
-                                              high=100,
-                                              init=40,
-                                              fmt='%1.0f',
-                                              sup_title='Maximum Energy',
-                                              units='keV',
-                                              update_func=self.update_x_axis)
+        self.low_energy_widget = Parameter_Widget(rect=[0.07, 0.25, 0.21, 0.03],
+                                                  title=r'$E_{min}$',
+                                                  low=0,
+                                                  high=100,
+                                                  init=0,
+                                                  fmt='%1.1f',
+                                                  sup_title='Energy',
+                                                  units='keV',
+                                                  update_func=self.update_x_axis)
+
+        self.high_energy_widget = Parameter_Widget(rect=[0.07, 0.20, 0.21, 0.03],
+                                                   title=r'$E_{max}$',
+                                                   low=0,
+                                                   high=100,
+                                                   init=40,
+                                                   fmt='%1.1f',
+                                                   units='keV',
+                                                   update_func=self.update_x_axis)
 
         # Show Optimal Energy
-        ax_opt_energy_button = plt.axes([0.07, 0.12, 0.13, 0.03])
+        ax_opt_energy_button = plt.axes([0.07, 0.12, 0.15, 0.03])
         ax_opt_energy_value = plt.axes([0.23, 0.12, 0.06, 0.03])
         ax_opt_energy_value.set_xticks([])
         ax_opt_energy_value.set_yticks([])
         self.E_opt_text = ax_opt_energy_value.text(0.1, 0.35, '')
         button_opt_energy = Button(
-            ax_opt_energy_button, 'Display optimal energy')
+            ax_opt_energy_button, 'Calculate optimal energy')
         button_opt_energy.on_clicked(self.get_optimal_energy)
 
         # Reset Defaults
@@ -332,7 +342,18 @@ class GUI(object):
         '''
         Resets the maximum energy axis value in response to change in slider.
         '''
-        self.main_ax.set_xlim([0, val])
+
+        E_max = self.high_energy_widget.slider.val
+        E_min = self.low_energy_widget.slider.val
+        width = 0.5
+
+        self.high_energy_widget.slider.valmin = E_min + width
+        self.low_energy_widget.slider.valmax = E_max - width
+
+        self.main_ax.set_xlim(
+            [self.low_energy_widget.slider.val, self.high_energy_widget.slider.val])
+
+        self.E_opt_text.set_text('')
         self.fig.canvas.draw_idle()
 
     def get_optimal_energy(self, val):
@@ -340,9 +361,13 @@ class GUI(object):
         Retrieves the maximum CNR value from the current curve and displays it in
         the designated text box.
         '''
+
+        E_low, E_high = self.main_ax.get_xlim()
         ydata = self.cnr_line.get_ydata()
-        ymax = ydata.max()
-        Emax = self.bg.E_int[ydata == ymax][0]
+        xdata = self.cnr_line.get_xdata()
+
+        ymax = ydata[(xdata >= E_low) & (xdata <= E_high)].max()
+        Emax = xdata[ydata == ymax][0]
         self.E_opt_text.set_text('{} keV'.format(np.round(Emax, 2)))
         self.fig.canvas.draw_idle()
 
@@ -356,5 +381,6 @@ class GUI(object):
         self.contrast_mat_widget.button.set_active(1)
         self.contrast_thickness_widget.slider.reset()
         self.contrast_density_widget.slider.reset()
-        self.energy_widget.slider.reset()
+        self.low_energy_widget.slider.reset()
+        self.high_energy_widget.slider.reset()
         self.intensity_widget.slider.reset()
