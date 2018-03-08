@@ -5,3 +5,6 @@ old_tests
 .ipynb_checkpoints
 convert_to_numpy.py
 misc
+*auto*
+*ltximg*
+*.org
