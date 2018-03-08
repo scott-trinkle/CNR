@@ -120,15 +120,15 @@ class GUI(object):
 
         # Background parameters
 
-        self.total_thickness_widget = Parameter_Widget(rect=[0.07, 0.65, 0.21, 0.03],
-                                                       title=r'$d_{tot}$',
-                                                       low=thickness_values[0],
-                                                       high=thickness_values[1],
-                                                       init=self.bg.thickness + self.contrast.thickness,
-                                                       units='nm' if self.nm else 'mm',
-                                                       fmt='%1.0f' if self.nm else '%1.2f',
-                                                       sup_title='Background Parameters',
-                                                       update_func=self.update)
+        self.bg_thickness_widget = Parameter_Widget(rect=[0.07, 0.65, 0.21, 0.03],
+                                                    title=r'$d_{tot}$',
+                                                    low=thickness_values[0],
+                                                    high=thickness_values[1],
+                                                    init=self.bg.thickness,
+                                                    units='nm' if self.nm else 'mm',
+                                                    fmt='%1.0f' if self.nm else '%1.2f',
+                                                    sup_title='Background Parameters',
+                                                    update_func=self.update)
 
         self.bg_density_widget = Parameter_Widget(rect=[0.07, 0.60, 0.21, 0.03],
                                                   title=r'$\rho_{bg}$',
@@ -261,22 +261,21 @@ class GUI(object):
         parameters.
         '''
 
-        # In the case that the total thickness is set to be smaller than the
-        # contrast thickness, this sets the background thickness to 0 and the
-        # contrast thickness equal to the total thickness. This way, it updates
-        # both total and contrast thicknesses in real time as the user slides the
-        # total thickness lower than the contrast thickness.
-        if self.total_thickness_widget.slider.val < self.contrast_thickness_widget.slider.val:
-            self.bg.thickness = 0
+        # In the case that the background thickness is set to be smaller than the
+        # contrast thickness, this sets them to be equal. This way, it updates
+        # both thicknesses in real time as the user slides the total thickness
+        # lower than the contrast thickness.
+        if self.bg_thickness_widget.slider.val < self.contrast_thickness_widget.slider.val:
+            # self.bg.thickness = self.contrast_thickness_widget.slider.val
             self.contrast_thickness_widget.slider.set_val(
-                self.total_thickness_widget.slider.val)
+                self.bg_thickness_widget.slider.val)
 
         else:
-            self.bg.thickness = self.total_thickness_widget.slider.val - self.contrast.thickness
+            self.bg.thickness = self.bg_thickness_widget.slider.val
 
             # Along the same lines, this limits the contrast thickness slider to be
             # no greater than the current value of the total thickness slider.
-            self.contrast_thickness_widget.slider.valmax = self.total_thickness_widget.slider.val
+            self.contrast_thickness_widget.slider.valmax = self.bg_thickness_widget.slider.val
 
         # Refreshes all other parameters
         self.bg.density = self.bg_density_widget.slider.val
@@ -293,7 +292,7 @@ class GUI(object):
             self.E_opt_text.set_text('')
             self.fig.canvas.draw_idle()  # Redraws curve
         except ValueError:
-            # Things blow up when the background thickness is 0.
+            # Things blow up when the thicknesses are equal
             pass
 
     def update_mat(self, val):
@@ -376,7 +375,7 @@ class GUI(object):
         Resets all parameters to defaults.
         '''
         self.bg_mat_widget.button.set_active(0)
-        self.total_thickness_widget.slider.reset()
+        self.bg_thickness_widget.slider.reset()
         self.bg_density_widget.slider.reset()
         self.contrast_mat_widget.button.set_active(1)
         self.contrast_thickness_widget.slider.reset()
