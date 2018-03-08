@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-sys.path.append('../code/')
+sys.path.append('../../../cnrgui/')
 from material import Material
 
 
@@ -58,7 +58,8 @@ def plot_1d(bg, contrast):
                 np.sqrt(np.exp(-bg.u_p_int * p * bg.thickness -
                                contrast.u_p_int * contrast.density * contrast.thickness))
             plt.plot(
-                bg.E_int, CNR, label='{} g/cc {} density'.format(np.round(p, 4), bg.name))
+                bg.E_int, CNR, label='{} g/cc {} density'.format(np.round(p, 4),
+                                                                 bg.name))
 
         plt.title('Background density\n{} g/cc {} density, {} mm {} length, {} mm {} length'.format(contrast.density,
                                                                                                     contrast.name,
@@ -77,20 +78,20 @@ def plot_1d(bg, contrast):
 For all:
 Contrast thickness: 0.1 mm
 
-Graph 1: 
+Graph 1:
 Os
 Total length: 2 mm
 p = [0.0001, 0.0005, 0.001, 0.003, 0.005]
 
-Graph 2: 
+Graph 2:
 Same but with U
 
-Graph 3: 
+Graph 3:
 Os
 p = 0.005
 total length = [1, 2, 3, 4, 5] mm
 
-Graph 4: 
+Graph 4:
 Same but with U
 '''
 

@@ -9,14 +9,14 @@ class Material(object):
 
     def __init__(self, name, thickness=None, density=None):
         self.name = name
-        self.fn = '../atten_data/u_p_' + name + '.npy'
+        self.fn = 'atten_data/u_p_' + name + '.npy'
         self.E, self.u_p = self.__read_atten_data__(self.fn)
         self.thickness = thickness
         self.density = density
 
     def change_mat(self, name):
         self.name = name
-        self.fn = '../atten_data/u_p_' + name + '.npy'
+        self.fn = 'atten_data/u_p_' + name + '.npy'
         self.E, self.u_p = self.__read_atten_data__(self.fn)
 
     def plot_u_p(self):
