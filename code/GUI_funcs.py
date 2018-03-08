@@ -244,14 +244,12 @@ class GUI(object):
         else:
             conv = 0.1
 
-        # CNR = np.sqrt(I) * abs(bg.u_p_int * bg.density - contrast.u_p_int * contrast.density) * \
+        # CNR = np.sqrt(I) * abs(contrast.u_p_int * contrast.density) * \
         #     np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * conv) -
         # contrast.u_p_int * contrast.density * (contrast.thickness * conv)))
 
-        CNR = np.sqrt(I) * abs(contrast.u_p_int * contrast.density) * \
-            np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * conv) -
-                           contrast.u_p_int * contrast.density * (contrast.thickness * conv)))
-
+        CNR = np.sqrt(I) * abs(contrast.u_p_int * contrast.density) / np.sqrt(np.exp(bg.u_p_int * bg.density * (bg.thickness * conv)) +
+                                                                              np.exp(contrast.u_p_int * contrast.density * (contrast.thickness * conv) + bg.u_p_int * bg.density * (bg.thickness * conv)))
         return CNR
 
     def update(self, value):
