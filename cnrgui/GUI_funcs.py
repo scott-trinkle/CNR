@@ -107,7 +107,6 @@ class GUI(object):
         self.main_ax.grid(True)
 
         # Material selection
-
         self.contrast_mat_widget = Material_Widget(rect=[0.07, 0.70, 0.08, 0.25],
                                                    title='Contrast\n Material',
                                                    default=contrast,  # Default: Osmium
@@ -119,7 +118,6 @@ class GUI(object):
                                              update_func=self.update_mat)
 
         # Background parameters
-
         self.bg_thickness_widget = Parameter_Widget(rect=[0.07, 0.65, 0.21, 0.03],
                                                     title=r'$d_{tot}$',
                                                     low=thickness_values[0],
@@ -140,7 +138,6 @@ class GUI(object):
                                                   update_func=self.update)
 
         # Contrast Parameters
-
         self.contrast_thickness_widget = Parameter_Widget(rect=[0.07, 0.50, 0.21, 0.03],
                                                           title=r'$d_{con}$',
                                                           low=thickness_values[0],
@@ -160,7 +157,6 @@ class GUI(object):
                                                         update_func=self.update)
 
         # System parameters
-
         self.intensity_widget = Parameter_Widget(rect=[0.07, 0.35, 0.21, 0.03],
                                                  title=r'$I_0$',
                                                  low=1,
@@ -243,10 +239,6 @@ class GUI(object):
             conv = 1e-7
         else:
             conv = 0.1
-
-        # CNR = np.sqrt(I) * abs(contrast.u_p_int * contrast.density) * \
-        #     np.sqrt(np.exp(-bg.u_p_int * bg.density * (bg.thickness * conv) -
-        # contrast.u_p_int * contrast.density * (contrast.thickness * conv)))
 
         with np.errstate(over='ignore'):
             CNR = np.sqrt(I) * contrast.u_p_int * \
