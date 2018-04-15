@@ -2,9 +2,6 @@
 *__pycache__*
 *.egg-info
 .ipynb_checkpoints
-# old_tests
-# convert_to_numpy.py
-# misc
 *auto*
 *ltximg*
 *.org
