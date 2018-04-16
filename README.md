@@ -1,17 +1,66 @@
 # CNR
 
-Developing a series of tools and GUIs to optimize contrast-to-noise ratio (CNR) in synchrotron microCT images.
+A GUI and series of tools to optimize contrast-to-noise ratio (CNR) in
+synchrotron microCT images.
 
-## To launch the GUI
+## Installation
 
-Run the python script 'code/run_GUI.py' to launch a matplotlib-based GUI displaying CNR as a function of x-ray energy under adjustable experimental parameters. The file contains well documented variables that can be edited to customize the allowable ranges of values for the sliders in the GUI. There is also a variable controlling whether the length variables are in units of mm or nm. 
+Download source files with:
+`git clone https://github.com/scott-trinkle/CNR.git`
 
-## To compare the current and previous implementations
+Install dependencies (numpy, matplotlib and scipy): 
+`cd CNR`
+`pip install -r requirements.txt`
 
-The folder 'replicating_alexandras_plots/' contains work related to reproducing plots made by former student Alexandra Rojek. Most importantly, the file 'replicating_alexandras_plots.pdf' contains side-by-side comparisons between CNR plots made by Alexandra and those made by myself. The folders 'alexandras_plots/' and 'my_plots/' contain the .pngs used to create the .pdf. Alexandra's figures were taken from 'Alexandra Rojec ACS Paper.pdf', my figures were generated with 'replicate_plots.py'
+Then install CNR with 
+`pip install .`
 
-A previous issue which led to discrepancies between my and Alexandra's plots has been resolved. 
+## To run
 
-## Data/
+Run with:
+`python cnrgui/run_GUI.py` 
 
-The folder 'atten_data/' contains attenuation data for all relevant materials, taken from [NIST](https://physics.nist.gov/PhysRefData/FFast/html/form.html). The raw data was saved into individual .txt files in the folder 'raw_data/'. The script 'convert_to_numpy.py' reads in the .txt files and saves them to the .npy format, where they are read into the GUI scripts. 
+This will launch a matplotlib-based GUI displaying CNR as a function of x-ray
+energy under adjustable experimental parameters. 
+
+The file contains well documented variables that can be edited to customize the
+allowable ranges of values for the sliders in the GUI. There is also a variable
+controlling whether the length variables are in units of mm or nm.
+
+## CNR Model
+
+The CNR is calculated with the following model based on [Spanne, 1989](http://iopscience.iop.org/article/10.1088/0031-9155/34/6/004/pdf):
+
+![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Ctext%7BCNR%7D%28E%29%20%3D%20%5Cfrac%7B%7C%5Cmu_1%28E%29%20-%20%5Cmu_2%28E%29%7C%7D%7B%5Csqrt%7B%5Ctext%7Bvar%7D%5C%7B%5Cmu_1%28E%29%5C%7D%20&plus;%20%5Ctext%7Bvar%7D%5C%7B%5Cmu_2%28E%29%5C%7D%7D%7D)
+
+where 
+![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmu_1%28E%29%20%5Cequiv%20%5Cmu_%7Bbg%7D%28E%29)
+is the attenuation at the center voxel of a
+homogeneous spherical object of background material "bg," and
+![](http://latex.codecogs.com/gif.latex?%5Cinline%20%24%5Cmu_2%28E%29%20%5Cequiv%20%5Cmu_%7Bbg%7D%28E%29%20&plus;%20%5Cmu_c%28E%29%24) 
+is the attenuation of that same voxel
+with the addition of a small amount of contrast material "c.'' 
+These two cases are indexed by 
+![](http://latex.codecogs.com/gif.latex?%5Cinline%20%24i%20%5Cin%20%5B1%2C2%5D%24).
+
+The variance is defined as
+
+![](http://latex.codecogs.com/gif.latex?%5Ctext%7Bvar%7D%5C%7B%5Cmu_i%28E%29%5C%7D%20%5Cpropto%20%5Cfrac%7B1%7D%7B%5Cbar%7BN%7D_i%28E%29%7D%2C)
+
+where
+
+![](http://latex.codecogs.com/gif.latex?%5Cbar%7BN%7D_i%28E%29%20%3D%20I_0%5Cint_0%5E%7B%5Cinfty%7D%20dE%27N%28E%27%20%7C%20E%2C%20%5Csigma_%7BE%2CBW%7D%29%5Ctext%7B%20exp%7D%5C%7B-A_i%28E%27%29%5C%7D%2C)
+
+Here, ![](http://latex.codecogs.com/gif.latex?%5Cinline%20%24I_0%28E%29%24) 
+is the incident intensity given by
+
+![](http://latex.codecogs.com/gif.latex?I_0%28E%29%20%3D%20I_0%20N%28E%20%7C%20E%2C%20%5Csigma_%7BE%2CBW%7D%29%2C)
+
+where ![](http://latex.codecogs.com/gif.latex?%5Cinline%20N%28E%20%7C%20E%2C%20%5Csigma_%7BE%2CBW%7D%29)
+is a Gaussian function with mean E and standard deviation ![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Csigma_%7BE%2CBW%7D)
+
+![](http://latex.codecogs.com/gif.latex?%5Cinline%20A_i%28E%29) is given by
+
+![](http://latex.codecogs.com/gif.latex?A_i%28E%29%20%3D%20%5Csum_%7Bj%7D%5Cmu_j%28E%29%20d_j%2C)
+
+where ![](http://latex.codecogs.com/gif.latex?%5Cinline%20d_j) is the length of each material, j, that is present in case i.
