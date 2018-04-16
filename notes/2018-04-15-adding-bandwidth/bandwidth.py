@@ -1,5 +1,5 @@
 from cnrgui.material import Material
-from cnrgui.util import cnr
+from cnrgui.util import cnr, match_energies
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
@@ -13,7 +13,8 @@ H2O = Material('H2O',
 Os = Material('Os',
               thickness=0.1,
               density=0.05)
-Os.match_energies_with(H2O)
+# Os.match_energies_with(H2O)
+match_energies(H2O, Os)
 
 with plt.style.context('seaborn-deep'):
     fig, axes = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(10, 8))
@@ -21,13 +22,13 @@ with plt.style.context('seaborn-deep'):
 ax_ins = inset_axes(axes[0], width='40%', height='45%', loc=9)
 
 for i, bw in enumerate([0, 1e-2, 1e-4]):
-    axes[0].plot(H2O.E_int, cnr(H2O, Os, bw=bw),
+    axes[0].plot(H2O.E, cnr(H2O, Os, bw=bw),
                  color='C{}'.format(i), label='BW={:.0e}'.format(bw))
-    ax_ins.plot(H2O.E_int, cnr(H2O, Os, bw=bw),
+    ax_ins.plot(H2O.E, cnr(H2O, Os, bw=bw),
                 color='C{}'.format(i), label='BW={}'.format(bw))
 
-x1, x2 = 12.582, 12.5835
-y1, y2 = 5.2166, 5.2179
+x1, x2 = 12.44, 12.47
+y1, y2 = 5.32, 5.335
 ax_ins.set_xlim(x1, x2)
 ax_ins.set_ylim(y1, y2)
 ax_ins.xaxis.set_major_locator(MaxNLocator(4))
@@ -49,7 +50,7 @@ for i, bw in enumerate([1e-2, 1e-4]):
     cnrbw = cnr(H2O, Os, bw=bw)
     with np.errstate(invalid='ignore'):
         diff = np.where(cnr0 != 0, abs(cnrbw - cnr0) / cnr0 * 100, 0)
-    axes[1].semilogy(H2O.E_int, diff, ':.', label='BW={:.0e}'.format(bw),
+    axes[1].semilogy(H2O.E, diff, ':.', label='BW={:.0e}'.format(bw),
                      color='C{}'.format(i+1))
 
 axes[1].grid(True)
