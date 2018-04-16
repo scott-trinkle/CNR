@@ -4,26 +4,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, RadioButtons, Button
 from material import Material
+from util import match_energies, cnr
 
 
-class Material_Widget(object):
+class Button_Widget(object):
     '''
     Contains parameters affecting the layout and function of radio buttons
-    used to choose different background and contrast materials.
+    used to choose contrast material and bandwidth
     '''
 
-    def __init__(self, rect, title, default, update_func):
+    def __init__(self, rect, title, options, default, update_func):
         self.ax = plt.axes(rect, aspect='equal')
         self.ax.set_title(title)
         self.button = RadioButtons(
-            self.ax, ('H2O', 'Os', 'U', 'Pb'), active=default)
+            self.ax, options, active=default)
         self.button.on_clicked(update_func)
 
 
 class Parameter_Widget(object):
     '''
     Contains parameters affecting the layout and function of sliders used to
-    control all physical experimental parameters.
+    control physical experimental parameters.
     '''
 
     def __init__(self, rect, title, low, high, init, units, update_func, sup_title=None, fmt='% 1.4f'):
@@ -54,8 +55,8 @@ class GUI(object):
         Maximum number of photons for entrance intensity slider
     thickness_units : str
         Either 'mm' or 'nm'
-    bg, contrast : int
-        Choice of initial materials.
+    contrast : int
+        Choice of initial contrast material.
              0 - H2O
              1 - Os
              2 - U
@@ -66,12 +67,10 @@ class GUI(object):
         Sets the dimensions of the GUI figure
     linecolor : str
         Sets the color of the CNR line plot. Choose from matplotlib keywords
-
-
     '''
 
     def __init__(self, thickness_values, bg_density_values, contrast_density_values,
-                 max_intensity_value, thickness_units='mm', bg=0, contrast=1, init_max_E=40,
+                 max_intensity_value, thickness_units='mm', def_contrast=1, init_max_E=40,
                  figsize=(14, 8), linecolor='k'):
 
         mat_names = ['H2O', 'Os', 'U', 'Pb']
@@ -79,15 +78,15 @@ class GUI(object):
         self.nm = False if thickness_units == 'mm' else True
 
         # Initial values
-        self.bg = Material(name=mat_names[bg],
+        self.bg = Material(name=mat_names[0],  # background is H2O
                            thickness=thickness_values.mean() * 3 / 4,
                            density=bg_density_values.mean())
 
-        self.contrast = Material(name=mat_names[contrast],
+        self.contrast = Material(name=mat_names[def_contrast],
                                  thickness=thickness_values.mean() / 4,
                                  density=contrast_density_values.mean())
 
-        self.contrast.match_energies_with(self.bg)
+        match_energies(self.bg, self.contrast)
 
         # Figure properties
         self.fig, self.main_ax = plt.subplots(figsize=figsize)
@@ -97,25 +96,30 @@ class GUI(object):
 
         # Default Main Axes properties
         self.cnr_line, = self.main_ax.plot(
-            self.bg.E_int, self.get_cnr(self.bg, self.contrast), linecolor)
+            self.bg.E, self.get_cnr(), linecolor)
         self.main_ax.set_xlabel('E [keV]')
         self.main_ax.set_ylabel('CNR')
-        eqn_abs = r'CNR = $\sqrt{I_0}\left(\frac{\mu}{\rho}\right)_{c}(E)\rho_{c}$ / '
-        eqn_exp = r'$\sqrt{exp\{\left(\frac{\mu}{\rho}\right)_{bg}(E)\rho_{bg} d_{tot}\} + exp\{\left(\frac{\mu}{\rho}\right)_{c}(E)\rho_c d_c + \left(\frac{\mu}{\rho}\right)_{bg}(E)\rho_{bg}d_{tot}\}}$'
-        self.main_ax.set_title(eqn_abs + eqn_exp)
+        # eqn_abs = r'CNR = $\sqrt{I_0}\left(\frac{\mu}{\rho}\right)_{c}(E)\rho_{c}$ / '
+        # eqn_exp = r'$\sqrt{exp\{\left(\frac{\mu}{\rho}\right)_{bg}(E)\rho_{bg} d_{tot}\} + exp\{\left(\frac{\mu}{\rho}\right)_{c}(E)\rho_c d_c + \left(\frac{\mu}{\rho}\right)_{bg}(E)\rho_{bg}d_{tot}\}}$'
+        title = r'CNR = $\mu_c$ / $\sqrt{var\{\mu_c\} + var\{\mu_c + \mu_{bg}\}}$'
+        self.main_ax.set_title(title)
         self.main_ax.set_xlim([0, init_max_E])
         self.main_ax.grid(True)
 
         # Material selection
-        self.contrast_mat_widget = Material_Widget(rect=[0.07, 0.70, 0.08, 0.25],
-                                                   title='Contrast\n Material',
-                                                   default=contrast,  # Default: Osmium
-                                                   update_func=self.update_mat)
+        self.contrast_mat_widget = Button_Widget(rect=[0.07, 0.70, 0.08, 0.25],
+                                                 title='Contrast\n Material',
+                                                 options=(
+                                                       'H2O', 'Os', 'U', 'Pb'),
+                                                 default=def_contrast,  # Default: Osmium
+                                                 update_func=self.update_mat)
 
-        self.bg_mat_widget = Material_Widget(rect=[0.20, 0.70, 0.08, 0.25],
-                                             title='Background\n Material',
-                                             default=bg,  # Default: H2O
-                                             update_func=self.update_mat)
+        # Bandwidth Selection
+        self.bandwidth_widget = Button_Widget(rect=[0.20, 0.70, 0.08, 0.25],
+                                              title='Energy\n Bandwidth',
+                                              options=('1e-2', '1e-4'),
+                                              default=0,  # Default: H2O
+                                              update_func=self.update)
 
         # Background parameters
         self.bg_thickness_widget = Parameter_Widget(rect=[0.07, 0.65, 0.21, 0.03],
@@ -203,35 +207,9 @@ class GUI(object):
 
         plt.show(block=True)
 
-    def get_cnr(self, bg, contrast, I=1):
+    def get_cnr(self, I0=1, bw=1e-2):
         '''
-        Calculates 1D CNR for two-material model.
-
-        Parameters
-        __________
-        bg : Material
-            Background material object with given thickness, density
-        contrast: Material
-            Contrast material object with given thickness, density
-        I : int
-            Entrance intensity (number of photons)
-
-        NOTES:
-        (1) bg and contrast should already have matched E vectors using the
-            match_energies_with method
-        (2) Assumes the following parameter units:
-
-                             I : photons
-                           u_p : cm2/g
-                       density : g / cm3
-                     thickness : mm (or nm if nm=True)
-
-
-        Returns
-        _______
-        CNR : ndarray
-            Values of CNR at the energy values given by the E_int attribute of both
-            bg and contrast
+        Calls cnrgui.util.cnr function 
         '''
 
         # Sets conversion factor from input thickness unit to cm
@@ -240,12 +218,8 @@ class GUI(object):
         else:
             conv = 0.1
 
-        with np.errstate(over='ignore'):
-            CNR = np.sqrt(I) * contrast.u_p_int * \
-                contrast.density / np.sqrt(np.exp(bg.u_p_int * bg.density * (bg.thickness * conv)) +
-                                           np.exp(contrast.u_p_int * contrast.density * (contrast.thickness * conv) +
-                                                  bg.u_p_int * bg.density * (bg.thickness * conv)))
-
+        CNR = cnr(bg=self.bg, contrast=self.contrast,
+                  I0=I0, conv=conv, bw=bw)
         return CNR
 
     def update(self, value):
@@ -276,11 +250,11 @@ class GUI(object):
         self.contrast.thickness = self.contrast_thickness_widget.slider.val
         self.contrast.density = self.contrast_density_widget.slider.val
         intensity = self.intensity_widget.slider.val
+        bw = float(self.bandwidth_widget.button.value_selected)
 
         try:
             # Recalculates CNR
-            self.cnr_line.set_ydata(self.get_cnr(
-                self.bg, self.contrast, intensity))
+            self.cnr_line.set_ydata(self.get_cnr(I0=intensity, bw=bw))
             self.update_y_axis()  # Updates y-axis limits
             # Resests optimal energy display to blank
             self.E_opt_text.set_text('')
@@ -291,22 +265,21 @@ class GUI(object):
 
     def update_mat(self, val):
         '''
-        Updates the background and contrast materials in response to a new
+        Updates the contrast material in response to a new
         selection by the user.
         '''
 
-        # Updates name, E and u_p attributes of materials, keeps other parameters
-        # fixed
+        # Updates name, E and u_p attributes of contrast material,
+        # keeps other parameters fixed
         self.contrast.change_mat(
             self.contrast_mat_widget.button.value_selected)
-        self.bg.change_mat(self.bg_mat_widget.button.value_selected)
 
         # Re-syncs materials' energy values
-        self.contrast.match_energies_with(self.bg)
+        match_energies(self.bg, self.contrast)
 
         # Resets plotted data
-        self.cnr_line.set_xdata(self.bg.E_int)
-        self.cnr_line.set_ydata(self.get_cnr(self.bg, self.contrast))
+        self.cnr_line.set_xdata(self.bg.E)
+        self.cnr_line.set_ydata(self.get_cnr())
         self.update_y_axis()
         self.E_opt_text.set_text('')
 
@@ -368,7 +341,7 @@ class GUI(object):
         '''
         Resets all parameters to defaults.
         '''
-        self.bg_mat_widget.button.set_active(0)
+        # self.bg_mat_widget.button.set_active(0)
         self.bg_thickness_widget.slider.reset()
         self.bg_density_widget.slider.reset()
         self.contrast_mat_widget.button.set_active(1)
