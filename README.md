@@ -1,23 +1,29 @@
 # CNR
 
-A GUI and series of tools to optimize contrast-to-noise ratio (CNR) in
+A GUI and series of tools to find the acquisition energy
+that optimizes the contrast-to-noise ratio (CNR) in
 synchrotron microCT images.
 
 ## Installation
 
 Download source files with:
+
 `git clone https://github.com/scott-trinkle/CNR.git`
 
 Install dependencies (numpy, matplotlib and scipy): 
+
 `cd CNR`
+
 `pip install -r requirements.txt`
 
 Then install CNR with 
+
 `pip install .`
 
 ## To run
 
 Run with:
+
 `python cnrgui/run_GUI.py` 
 
 This will launch a matplotlib-based GUI displaying CNR as a function of x-ray
